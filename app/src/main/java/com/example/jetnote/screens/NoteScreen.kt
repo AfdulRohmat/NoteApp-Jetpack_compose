@@ -25,9 +25,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun NoteScreen(
-    notes: List<NoteModel>,
-    onAddNote: () -> Unit,
-    onRemoveNote: () -> Unit
+    notes: List<NoteModel>, onAddNote: () -> Unit, onRemoveNote: () -> Unit
 ) {
     // HANDLE VARIABLE
     var title by remember {
@@ -63,7 +61,8 @@ fun NoteScreen(
 
             // NOTE TEXT FIELD
             // Title
-            CustomTextField(modifier = Modifier.fillMaxWidth(),
+            CustomTextField(
+                modifier = Modifier.fillMaxWidth(),
                 text = title,
                 label = "Title",
                 onTextChange = {
@@ -106,12 +105,10 @@ fun NoteScreen(
             // Lazy Column
             LazyColumn(content = {
                 items(notes) { note ->
-                    CustomListTile(
-                        title = note.title,
+                    CustomListTile(title = note.title,
                         description = note.description,
-                        timeStamp = note.date.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy")),
-                        onDeleteButton = {}
-                    )
+                        timeStamp = note.date.toString(),
+                        onDeleteButton = {})
                 }
             })
 
