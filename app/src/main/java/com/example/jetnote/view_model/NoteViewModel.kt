@@ -23,11 +23,13 @@ class NoteViewModel @Inject constructor(private val noteRepository: NoteReposito
         getAllNote()
     }
 
+
     // GET ALL NOTE
     private fun getAllNote() = viewModelScope.launch(Dispatchers.IO) {
         noteRepository.getALlNotes().distinctUntilChanged().collect { listOfNote ->
             if (listOfNote.isEmpty()) {
                 Log.d("Empty List", "Empty List")
+
             } else {
                 _noteList.value = listOfNote
             }
@@ -37,27 +39,27 @@ class NoteViewModel @Inject constructor(private val noteRepository: NoteReposito
 
 
     // GET NOTE BY ID
-    suspend fun getNoteById(id: String) = viewModelScope.launch {
+     fun getNoteById(id: String) = viewModelScope.launch {
         noteRepository.getNoteById(id)
     }
 
     // ADD NOTE
-    suspend fun addNote(note: NoteModelEntity) = viewModelScope.launch {
+     fun addNote(note: NoteModelEntity) = viewModelScope.launch {
         noteRepository.addNote(note)
     }
 
     // UPDATE NOTE
-    suspend fun updateNote(note: NoteModelEntity) = viewModelScope.launch {
+     fun updateNote(note: NoteModelEntity) = viewModelScope.launch {
         noteRepository.updateNote(note)
     }
 
     // DELETE NOTE
-    suspend fun deleteNote(note: NoteModelEntity) = viewModelScope.launch {
+     fun deleteNote(note: NoteModelEntity) = viewModelScope.launch {
         noteRepository.deleteNote(note)
     }
 
     // DELETE ALL NOTE
-    suspend fun deleteAllNote() = viewModelScope.launch {
+     fun deleteAllNote() = viewModelScope.launch {
         noteRepository.deleteAllNote()
     }
 

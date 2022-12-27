@@ -1,5 +1,6 @@
 package com.example.jetnote.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,6 +18,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.jetnote.roomDatabase.NoteModelEntity
+import com.example.jetnote.utils.formatDate
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -69,12 +72,13 @@ fun CustomButton(
 
 @Composable
 fun CustomListTile(
-    title: String, description: String, timeStamp: String, onDeleteButton: () -> Unit
+    note: NoteModelEntity, onDeleteButton: (NoteModelEntity) -> Unit, onTapCard: () -> Unit
 ) {
     Card(
         elevation = 8.dp, modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 10.dp)
+            .clickable { onTapCard() }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -84,17 +88,19 @@ fun CustomListTile(
                     .padding(16.dp)
                     .weight(0.8f)
             ) {
-                Text(text = title, modifier = Modifier.padding(top = 4.dp))
-                Text(text = description, modifier = Modifier.padding(top = 4.dp))
+                Text(text = note.title, modifier = Modifier.padding(top = 4.dp))
+                Text(text = note.description, modifier = Modifier.padding(top = 4.dp))
                 Text(
-                    text = timeStamp, fontSize = 12.sp, modifier = Modifier.padding(vertical = 4.dp)
+                    text = formatDate(note.date.time),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
 
             Column(
                 verticalArrangement = Arrangement.Center
             ) {
-                IconButton(onClick = onDeleteButton) {
+                IconButton(onClick = { onDeleteButton(note) }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
 
                 }
@@ -111,5 +117,5 @@ fun CustomListTile(
 @Preview(showBackground = true)
 @Composable
 fun NoteComponentsPreview() {
-    CustomListTile(title = "Title", description = "Description", timeStamp = "12-12-2022", onDeleteButton = {})
+
 }

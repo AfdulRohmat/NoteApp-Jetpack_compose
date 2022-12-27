@@ -1,5 +1,8 @@
 package com.example.jetnote.screens
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,13 +24,18 @@ import com.example.jetnote.R
 import com.example.jetnote.components.CustomButton
 import com.example.jetnote.components.CustomListTile
 import com.example.jetnote.components.CustomTextField
-import com.example.jetnote.model.NoteModel
+import com.example.jetnote.roomDatabase.NoteModelEntity
+import com.example.jetnote.view_model.NoteViewModel
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun NoteScreen(
-    notes: List<NoteModel>, onAddNote: () -> Unit, onRemoveNote: () -> Unit
-) {
+    notes: List<NoteModelEntity>,
+    onAddNote: (NoteModelEntity) -> Unit,
+    onRemoveNote: (NoteModelEntity) -> Unit,
+    onEditNote: (NoteModelEntity) -> Unit,
+
+    ) {
     // HANDLE VARIABLE
     var title by remember {
         mutableStateOf("")
@@ -34,6 +43,12 @@ fun NoteScreen(
     var description by remember {
         mutableStateOf("")
     }
+
+    var isEditNote by remember {
+        mutableStateOf(false)
+    }
+
+    val context = LocalContext.current
 
 
     // COMPOSE WIDGET
@@ -84,16 +99,36 @@ fun NoteScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // BUTTON
-            CustomButton(title = "Add Note", modifier = Modifier.fillMaxWidth(), onButtonTap = {
-                if (title.isNotEmpty() && description.isNotEmpty()) {
-                    // Save Note into List
+            CustomButton(
+                title = if (isEditNote) "Edit Note" else "Add Note",
+                modifier = Modifier.fillMaxWidth(),
+                onButtonTap = {
+                    if (isEditNote) {
+                        if (title.isNotEmpty() && description.isNotEmpty()) {
+                            // Edit Note into List
+                            if (title.isNotEmpty() && description.isNotEmpty()) {
+                                onEditNote(NoteModelEntity(title = title, description = description))
+                            }
+                            // CLear variable
+                            title = ""
+                            description = ""
+                            isEditNote = false
+                            Toast.makeText(context, "Note Updated", Toast.LENGTH_SHORT).show()
+                        }
 
-
-                    // CLear variable
-                    title = ""
-                    description = ""
-                }
-            })
+                    } else {
+                        if (title.isNotEmpty() && description.isNotEmpty()) {
+                            // Save Note into List
+                            if (title.isNotEmpty() && description.isNotEmpty()) {
+                                onAddNote(NoteModelEntity(title = title, description = description))
+                            }
+                            // CLear variable
+                            title = ""
+                            description = ""
+                            Toast.makeText(context, "Note Added", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                })
 
             // Divider
             Divider(
@@ -105,13 +140,13 @@ fun NoteScreen(
             // Lazy Column
             LazyColumn(content = {
                 items(notes) { note ->
-                    CustomListTile(title = note.title,
-                        description = note.description,
-                        timeStamp = note.date.toString(),
-                        onDeleteButton = {})
+                    CustomListTile(note = note, onDeleteButton = { onRemoveNote(it) }, onTapCard = {
+                        title = note.title
+                        description = note.description
+                        isEditNote = true
+                    })
                 }
             })
-
 
         }
 
@@ -123,5 +158,5 @@ fun NoteScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun NoteScreenPreview() {
-    NoteScreen(notes = emptyList(), onAddNote = { /*TODO*/ }, onRemoveNote = {})
+//    NoteScreen(notes = emptyList(), onAddNote = { /*TODO*/ }, onRemoveNote = {})
 }
